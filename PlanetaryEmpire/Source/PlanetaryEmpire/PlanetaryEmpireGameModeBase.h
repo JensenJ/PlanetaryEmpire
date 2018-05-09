@@ -13,8 +13,4 @@ UCLASS()
 class PLANETARYEMPIRE_API APlanetaryEmpireGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
-	
-	
-	
 };
