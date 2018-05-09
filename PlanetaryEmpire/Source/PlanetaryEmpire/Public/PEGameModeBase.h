@@ -15,7 +15,4 @@ class PLANETARYEMPIRE_API APEGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 private:
 	APEGameModeBase();
-	
-	
-	
 };
