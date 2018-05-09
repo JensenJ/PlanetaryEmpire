@@ -3,15 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameMode.h"
-#include "PE_GameMode.generated.h"
+#include "GameFramework/PlayerState.h"
+#include "PEPlayerState.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class PLANETARYEMPIRE_API APE_GameMode : public AGameMode
+class PLANETARYEMPIRE_API APEPlayerState : public APlayerState
 {
 	GENERATED_BODY()
-
-	APE_GameMode();
+	
+	
 	
 	
 };

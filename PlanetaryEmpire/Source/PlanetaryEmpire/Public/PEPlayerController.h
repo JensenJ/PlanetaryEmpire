@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "PE_PlayerController.generated.h"
+#include "PEPlayerController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PLANETARYEMPIRE_API APE_PlayerController : public APlayerController
+class PLANETARYEMPIRE_API APEPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-
-		APE_PlayerController();
+	
+	
 	
 	
 };
