@@ -7,9 +7,6 @@
 #include "Components/InputComponent.h"
 #include "PEPlayerController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class PLANETARYEMPIRE_API APEPlayerController : public APlayerController
 {
@@ -25,16 +22,17 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	//CameraPawn Reference and getter
-	UPROPERTY(VisibleAnywhere, Category = References)
-	class APawn* CameraPawnRef = nullptr;
-	APawn* GetCameraPawnReference() const;
+
+	//Decides whether camera can move
+	bool bCameraMoveable = true;
 
 	//Input methods
-	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent);
-	void InputMoveCameraForward();
-	void InputMoveCameraRight();
-	void InputFastMoveCamera();
-	void InputRotateCamera();
-	void InputZoomInCamera();
+	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent);
+	void InputMoveCameraForward(float value);
+	void InputMoveCameraRight(float value);
+	void InputFastMoveCamera(float value);
+	void InputRotateCamera(float value);
+	void InputZoomInCamera(float value);
+
+	void CalculateMovementSpeed();
 };

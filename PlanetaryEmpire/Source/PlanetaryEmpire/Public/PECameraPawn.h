@@ -13,19 +13,30 @@ class PLANETARYEMPIRE_API APECameraPawn : public APawn
 
 public:
 	// Sets default values for this pawn's properties
-	APECameraPawn();
+	APECameraPawn(const FObjectInitializer& ObjectInit);
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+private:	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	
-	
+	// Camera Components in order of parentage
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	class USceneComponent* SceneComponent = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	class USphereComponent* SphereComponent = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	class USpringArmComponent* SpringArmComponent = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	class UCameraComponent* CameraComponent = nullptr;
+
+
 };
