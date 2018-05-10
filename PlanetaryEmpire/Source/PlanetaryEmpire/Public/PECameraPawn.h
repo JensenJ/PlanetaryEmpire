@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Components/SphereComponent.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Components/SceneComponent.h"
 #include "PECameraPawn.generated.h"
 
 UCLASS()
@@ -14,6 +18,12 @@ class PLANETARYEMPIRE_API APECameraPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	APECameraPawn(const FObjectInitializer& ObjectInit);
+
+	// Getters
+	USceneComponent* GetSceneComponent();
+	USphereComponent* GetSphereComponent();
+	USpringArmComponent* GetSpringArmComponent();
+	UCameraComponent* GetCameraComponent();
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,17 +36,16 @@ private:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// Camera Components in order of parentage
-	UPROPERTY(VisibleAnywhere, Category = Camera)
+	UPROPERTY(EditAnywhere, Category = Camera)
 	class USceneComponent* SceneComponent = nullptr;
 
-	UPROPERTY(VisibleAnywhere, Category = Camera)
+	UPROPERTY(EditAnywhere, Category = Camera)
 	class USphereComponent* SphereComponent = nullptr;
 
-	UPROPERTY(VisibleAnywhere, Category = Camera)
+	UPROPERTY(EditAnywhere, Category = Camera)
 	class USpringArmComponent* SpringArmComponent = nullptr;
 
-	UPROPERTY(VisibleAnywhere, Category = Camera)
+	UPROPERTY(EditAnywhere, Category = Camera)
 	class UCameraComponent* CameraComponent = nullptr;
-
 
 };

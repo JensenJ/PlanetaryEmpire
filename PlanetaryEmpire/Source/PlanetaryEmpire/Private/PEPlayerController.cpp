@@ -14,6 +14,10 @@ void APEPlayerController::Tick(float DeltaTime) {
 
 }
 
+///////////////////////////////////////////////////
+///////////////// Player Input ////////////////////
+///////////////////////////////////////////////////
+
 void APEPlayerController::SetupPlayerInputComponent(class UInputComponent* InputComponent){
 	EnableInput(this);
 	check(InputComponent);
@@ -45,6 +49,8 @@ void APEPlayerController::InputRotateCamera(float value) {
 void APEPlayerController::InputZoomInCamera(float value) {
 	if (!bCameraMoveable) return;
 }
+
+///////////////////////////////////////////////////
 
 void APEPlayerController::CalculateMovementSpeed() {
 	
