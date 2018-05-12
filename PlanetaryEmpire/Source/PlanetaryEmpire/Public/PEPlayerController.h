@@ -48,11 +48,11 @@ private:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent);
 	void InputMoveCameraForward(float value);
 	void InputMoveCameraRight(float value);
-	void InputFastMoveCamera(float value);
 	void InputRotateCameraX(float value);
 	void InputRotateCameraY(float value);
 	void InputZoomInCamera(float value);
 	void InputTogglePan();
+	void InputToggleFastMove();
 
 	// Camera Functions
 	float CalculateMovementSpeed();
@@ -64,6 +64,7 @@ private:
 	//Camera Variables
 	bool bCameraMoveable = true;
 	bool bPanToggled = false;
+	bool bFastMove = false;
 	float MovementSpeed = 0.0f;
 	float FastMoveMultiplier = 1.0f;
 	float PanSensitivity = 5.0f;

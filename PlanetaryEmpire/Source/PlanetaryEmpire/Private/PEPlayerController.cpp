@@ -42,10 +42,10 @@ void APEPlayerController::SetupPlayerInputComponent(class UInputComponent* Input
 		return;
 	}
 	InputComponent->BindAction("TogglePan", IE_Pressed, this, &APEPlayerController::InputTogglePan);
+	InputComponent->BindAction("FastMove", IE_Pressed, this, &APEPlayerController::InputToggleFastMove);
 
 	InputComponent->BindAxis("MoveForward", this, &APEPlayerController::InputMoveCameraForward);
 	InputComponent->BindAxis("MoveRight", this, &APEPlayerController::InputMoveCameraRight);
-	InputComponent->BindAxis("FastMove", this, &APEPlayerController::InputFastMoveCamera);
 	InputComponent->BindAxis("RotateX", this, &APEPlayerController::InputRotateCameraX);
 	InputComponent->BindAxis("RotateY", this, &APEPlayerController::InputRotateCameraY);
 	InputComponent->BindAxis("ZoomIn", this, &APEPlayerController::InputZoomInCamera);
@@ -63,12 +63,7 @@ void APEPlayerController::InputMoveCameraRight(float AxisValue) {
 	if (!CameraPawn) return;
 	if (!bCameraMoveable) return;
 	MovementSpeed = CalculateMovementSpeed();
-	CameraPawn->SetActorTransform(MovementY(MovementSpeed, FastMoveMultiplier, AxisValue));
-}
-
-void APEPlayerController::InputFastMoveCamera(float AxisValue) {
-	if (!CameraPawn) return;
-	if (!bCameraMoveable) return;
+	CameraPawn->SetActorTransform(MovementY(AxisValue, MovementSpeed, FastMoveMultiplier));
 }
 
 void APEPlayerController::InputRotateCameraX(float AxisValue) {
@@ -98,6 +93,16 @@ void APEPlayerController::InputTogglePan() {
 	bPanToggled = !bPanToggled;
 }
 
+void APEPlayerController::InputToggleFastMove() {
+	if (!bCameraMoveable) return;
+	bFastMove = !bFastMove;
+	if (bFastMove) {
+		FastMoveMultiplier = 2.0f;
+	}
+	else {
+		FastMoveMultiplier = 1.0f;
+	}
+}
 ///////////////////////////////////////////////////
 /////////////// Camera Calculations ///////////////
 ///////////////////////////////////////////////////
@@ -130,6 +135,7 @@ FTransform APEPlayerController::MovementX(float AxisValue, float MovementSpeed, 
 	UKismetMathLibrary::BreakTransform(CameraPawnTransform, OutTransform, OutRotator, OutScale);
 	FVector AddedVector = TransformDirection + OutTransform;
 	FTransform FinalTransform = UKismetMathLibrary::MakeTransform(AddedVector, OutRotator, OutScale);
+
 	return FinalTransform;
 }
 
@@ -145,6 +151,10 @@ FTransform APEPlayerController::MovementY(float AxisValue, float MovementSpeed, 
 	FVector OutScale;
 	UKismetMathLibrary::BreakTransform(CameraPawnTransform, OutTransform, OutRotator, OutScale);
 	FVector AddedVector = TransformDirection + OutTransform;
+	float x, y, z;
+	UKismetMathLibrary::BreakVector(AddedVector, x, y, z);
+	z = 50;
+	FVector FinalVector = UKismetMathLibrary::MakeVector(x, y, z);
 	FTransform FinalTransform = UKismetMathLibrary::MakeTransform(AddedVector, OutRotator, OutScale);
 	return FinalTransform;
 }
@@ -169,4 +179,3 @@ FRotator APEPlayerController::PanY(float AxisValue, float PanSensitivity) {
 	FRotator FinalRotator = UKismetMathLibrary::MakeRotator(RotatorRoll, PanSensitivity, RotatorYaw);
 	return FinalRotator;
 }
-///////////////////////////////////////////////////
