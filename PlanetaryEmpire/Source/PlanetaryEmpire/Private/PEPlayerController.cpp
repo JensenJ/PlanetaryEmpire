@@ -2,13 +2,30 @@
 
 #include "PEPlayerController.h"
 #include "PECameraPawn.h"
+#include "Math/UnrealMathUtility.h"
+#include "Kismet/KismetMathLibrary.h"
 
 APEPlayerController::APEPlayerController() {
+	
+}
 
+APECameraPawn* APEPlayerController::GetControlledPawn() const{
+	return Cast<APECameraPawn>(GetPawn());
 }
 
 void APEPlayerController::BeginPlay() {
 	SetupPlayerInputComponent(InputComponent);
+
+	// Get camera pawn class
+	CameraPawn = GetControlledPawn();
+	if (!CameraPawn) {
+		UE_LOG(LogTemp, Error, TEXT("PEPlayerController: CameraPawn Class not found"));
+		return;
+	}
+	LocalSceneComponent = CameraPawn->GetSceneComponent();
+	LocalSphereComponent = CameraPawn->GetSphereComponent();
+	LocalSpringArmComponent = CameraPawn->GetSpringArmComponent();
+	LocalCameraComponent = CameraPawn->GetCameraComponent();
 }
 void APEPlayerController::Tick(float DeltaTime) {
 
@@ -20,9 +37,8 @@ void APEPlayerController::Tick(float DeltaTime) {
 
 void APEPlayerController::SetupPlayerInputComponent(class UInputComponent* InputComponent){
 	EnableInput(this);
-	check(InputComponent);
 	if (!InputComponent) {
-		UE_LOG(LogTemp, Error, TEXT("PEPlayerController: Input Component not found"));
+		UE_LOG(LogTemp, Error, TEXT("PEPlayerController: Input Component not found::PointerProtection"));
 		return;
 	}
 	InputComponent->BindAxis("MoveForward", this, &APEPlayerController::InputMoveCameraForward);
@@ -33,25 +49,64 @@ void APEPlayerController::SetupPlayerInputComponent(class UInputComponent* Input
 
 }
 
-void APEPlayerController::InputMoveCameraForward(float value) {
+void APEPlayerController::InputMoveCameraForward(float AxisValue) {
+	if (!CameraPawn) return;
 	if (!bCameraMoveable) return;
-	CalculateMovementSpeed();
+	MovementSpeed = CalculateMovementSpeed();
+	FTransform FinalTransform = MovementX(AxisValue, MovementSpeed, FastMoveMultiplier);
+	LocalSceneComponent->SetWorldTransform(FinalTransform);
 }
-void APEPlayerController::InputMoveCameraRight(float value) {
-	if (!bCameraMoveable) return;
-}
-void APEPlayerController::InputFastMoveCamera(float value) {
-	if (!bCameraMoveable) return;
-}
-void APEPlayerController::InputRotateCamera(float value) {
-	if (!bCameraMoveable) return;
-}
-void APEPlayerController::InputZoomInCamera(float value) {
+
+void APEPlayerController::InputMoveCameraRight(float AxisValue) {
+	if (!CameraPawn) return;
 	if (!bCameraMoveable) return;
 }
+
+void APEPlayerController::InputFastMoveCamera(float AxisValue) {
+	if (!CameraPawn) return;
+	if (!bCameraMoveable) return;
+}
+
+void APEPlayerController::InputRotateCamera(float AxisValue) {
+	if (!CameraPawn) return;
+	if (!bCameraMoveable) return;
+}
+
+void APEPlayerController::InputZoomInCamera(float AxisValue) {
+	if (!CameraPawn) return;
+	if (!bCameraMoveable) return;
+}
+
 
 ///////////////////////////////////////////////////
 
-void APEPlayerController::CalculateMovementSpeed() {
-	
+float APEPlayerController::CalculateMovementSpeed() {
+	if (!LocalSpringArmComponent) {
+		UE_LOG(LogTemp, Error, TEXT("PEPlayerController: Calculation of movement speed failed::LocalSpringArmComponent"));
+		return 100.0f;
+	}
+	float LocalMovementSpeed = LocalSpringArmComponent->TargetArmLength / 100;
+	LocalMovementSpeed = FMath::Clamp(LocalMovementSpeed, 5.0f, 20.0f);
+	if (!LocalMovementSpeed) {
+		UE_LOG(LogTemp, Error, TEXT("PEPlayerController: Calculation of movement speed failed::LocalMovementSpeed"));
+		return 100.0f;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("PEPlayerController: Movement speed: %f"), LocalMovementSpeed);
+	return LocalMovementSpeed;
+}
+
+FTransform APEPlayerController::MovementX(float AxisValue, float MovementSpeed, float SpeedMultiplier) {
+	MovementSpeed = (MovementSpeed * SpeedMultiplier) * AxisValue;
+
+	FVector ForwardMovementVector = FVector(MovementSpeed, 0.0f, 0.0f);
+	FTransform CameraPawnTransform = CameraPawn->GetActorTransform();
+	FVector TransformDirection = UKismetMathLibrary::TransformDirection(CameraPawnTransform, ForwardMovementVector);
+
+	FVector OutTransform;
+	FRotator OutRotator;
+	FVector OutScale;
+	UKismetMathLibrary::BreakTransform(CameraPawnTransform, OutTransform, OutRotator, OutScale);
+	FVector AddedVector = TransformDirection + OutTransform;
+	FTransform FinalTransform = UKismetMathLibrary::MakeTransform(AddedVector, OutRotator, OutScale);
+	return FinalTransform;
 }

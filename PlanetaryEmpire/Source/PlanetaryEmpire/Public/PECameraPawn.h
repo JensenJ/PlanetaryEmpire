@@ -25,16 +25,6 @@ public:
 	USpringArmComponent* GetSpringArmComponent();
 	UCameraComponent* GetCameraComponent();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-private:	
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	// Camera Components in order of parentage
 	UPROPERTY(EditAnywhere, Category = Camera)
 	class USceneComponent* SceneComponent = nullptr;
@@ -47,5 +37,15 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Camera)
 	class UCameraComponent* CameraComponent = nullptr;
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+private:	
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 
 };

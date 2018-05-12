@@ -30,19 +30,19 @@ APECameraPawn::APECameraPawn(const class FObjectInitializer& ObjectInit)
 	CameraComponent = ObjectInit.CreateDefaultSubobject<UCameraComponent>(this, TEXT("CameraComponent"), false);
 	
 	if (!SceneComponent) {
-		UE_LOG(LogTemp, Error, TEXT("PECameraPawn: Scene Component not found"));
+		UE_LOG(LogTemp, Error, TEXT("PECameraPawn: Scene Component not found::PointerProtection"));
 		return;
 	}
 	if (!SphereComponent) {
-		UE_LOG(LogTemp, Error, TEXT("PECameraPawn: Sphere Component not found"));
+		UE_LOG(LogTemp, Error, TEXT("PECameraPawn: Sphere Component not found::PointerProtection"));
 		return;
 	}
 	if (!SpringArmComponent) {
-		UE_LOG(LogTemp, Error, TEXT("PECameraPawn: Spring Arm Component not found"));
+		UE_LOG(LogTemp, Error, TEXT("PECameraPawn: Spring Arm Component not found::PointerProtection"));
 		return;
 	}
 	if (!CameraComponent) {
-		UE_LOG(LogTemp, Error, TEXT("PECameraPawn: Camera Component not found"));
+		UE_LOG(LogTemp, Error, TEXT("PECameraPawn: Camera Component not found::PointerProtection"));
 		return;
 	}
 
