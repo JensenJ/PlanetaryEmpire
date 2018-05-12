@@ -53,13 +53,16 @@ void APEPlayerController::InputMoveCameraForward(float AxisValue) {
 	if (!CameraPawn) return;
 	if (!bCameraMoveable) return;
 	MovementSpeed = CalculateMovementSpeed();
-	FTransform FinalTransform = MovementX(AxisValue, MovementSpeed, FastMoveMultiplier);
-	LocalSceneComponent->SetWorldTransform(FinalTransform);
+	FTransform FinalTransform = MovementX(MovementSpeed, FastMoveMultiplier, AxisValue);
+	CameraPawn->SetActorTransform(FinalTransform);
 }
 
 void APEPlayerController::InputMoveCameraRight(float AxisValue) {
 	if (!CameraPawn) return;
 	if (!bCameraMoveable) return;
+	MovementSpeed = CalculateMovementSpeed();
+	FTransform FinalTransform = MovementY(MovementSpeed, FastMoveMultiplier, AxisValue);
+	CameraPawn->SetActorTransform(FinalTransform);
 }
 
 void APEPlayerController::InputFastMoveCamera(float AxisValue) {
@@ -79,19 +82,21 @@ void APEPlayerController::InputZoomInCamera(float AxisValue) {
 
 
 ///////////////////////////////////////////////////
+/////////////// Camera Calculations ///////////////
+///////////////////////////////////////////////////
 
 float APEPlayerController::CalculateMovementSpeed() {
 	if (!LocalSpringArmComponent) {
-		UE_LOG(LogTemp, Error, TEXT("PEPlayerController: Calculation of movement speed failed::LocalSpringArmComponent"));
+		UE_LOG(LogTemp, Error, TEXT("PEPlayerController: Calculation of movement speed X failed::LocalSpringArmComponent"));
 		return 100.0f;
 	}
 	float LocalMovementSpeed = LocalSpringArmComponent->TargetArmLength / 100;
 	LocalMovementSpeed = FMath::Clamp(LocalMovementSpeed, 5.0f, 20.0f);
 	if (!LocalMovementSpeed) {
-		UE_LOG(LogTemp, Error, TEXT("PEPlayerController: Calculation of movement speed failed::LocalMovementSpeed"));
+		UE_LOG(LogTemp, Error, TEXT("PEPlayerController: Calculation of movement speed X failed::LocalMovementSpeed"));
 		return 100.0f;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("PEPlayerController: Movement speed: %f"), LocalMovementSpeed);
+	//UE_LOG(LogTemp, Warning, TEXT("PEPlayerController: Movement speed: %f"), LocalMovementSpeed);
 	return LocalMovementSpeed;
 }
 
@@ -110,3 +115,21 @@ FTransform APEPlayerController::MovementX(float AxisValue, float MovementSpeed, 
 	FTransform FinalTransform = UKismetMathLibrary::MakeTransform(AddedVector, OutRotator, OutScale);
 	return FinalTransform;
 }
+
+FTransform APEPlayerController::MovementY(float AxisValue, float MovementSpeed, float SpeedMultiplier) {
+	MovementSpeed = (MovementSpeed * SpeedMultiplier) * AxisValue;
+
+	FVector ForwardMovementVector = FVector(0.0f, MovementSpeed, 0.0f);
+	FTransform CameraPawnTransform = CameraPawn->GetActorTransform();
+	FVector TransformDirection = UKismetMathLibrary::TransformDirection(CameraPawnTransform, ForwardMovementVector);
+
+	FVector OutTransform;
+	FRotator OutRotator;
+	FVector OutScale;
+	UKismetMathLibrary::BreakTransform(CameraPawnTransform, OutTransform, OutRotator, OutScale);
+	FVector AddedVector = TransformDirection + OutTransform;
+	FTransform FinalTransform = UKismetMathLibrary::MakeTransform(AddedVector, OutRotator, OutScale);
+	return FinalTransform;
+}
+
+///////////////////////////////////////////////////

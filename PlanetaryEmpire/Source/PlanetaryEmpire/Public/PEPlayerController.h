@@ -58,6 +58,7 @@ private:
 	// Camera Functions
 	float CalculateMovementSpeed();
 	FTransform MovementX(float AxisValue, float MoveSensitivity, float SpeedMultiplier);
+	FTransform MovementY(float AxisValue, float MoveSensitivity, float SpeedMultiplier);
 
 	//Camera Variables
 	float MovementSpeed = 0.0f;
