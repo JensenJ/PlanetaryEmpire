@@ -48,7 +48,7 @@ APECameraPawn::APECameraPawn(const class FObjectInitializer& ObjectInit)
 
 	// Setup scene component
 	SceneComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	SceneComponent->RelativeLocation = FVector(0.0f, 0.0f, 300.0f);
+	SceneComponent->RelativeLocation = FVector(0.0f, 0.0f, 50.0f);
 
 	// Setup sphere component
 	SphereComponent->AttachToComponent(SceneComponent, FAttachmentTransformRules::KeepRelativeTransform);

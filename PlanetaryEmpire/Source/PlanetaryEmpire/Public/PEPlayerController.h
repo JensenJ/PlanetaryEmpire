@@ -44,23 +44,27 @@ private:
 	// Function to get controlled pawn
 	APECameraPawn* GetControlledPawn() const;
 
-	// Decides whether camera can move
-	bool bCameraMoveable = true;
-
 	// Input methods
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent);
 	void InputMoveCameraForward(float value);
 	void InputMoveCameraRight(float value);
 	void InputFastMoveCamera(float value);
-	void InputRotateCamera(float value);
+	void InputRotateCameraX(float value);
+	void InputRotateCameraY(float value);
 	void InputZoomInCamera(float value);
+	void InputTogglePan();
 
 	// Camera Functions
 	float CalculateMovementSpeed();
 	FTransform MovementX(float AxisValue, float MoveSensitivity, float SpeedMultiplier);
 	FTransform MovementY(float AxisValue, float MoveSensitivity, float SpeedMultiplier);
+	FRotator PanX(float AxisValue, float PanSensitiviy);
+	FRotator PanY(float AxisValue, float PanSensitivity);
 
 	//Camera Variables
+	bool bCameraMoveable = true;
+	bool bPanToggled = false;
 	float MovementSpeed = 0.0f;
 	float FastMoveMultiplier = 1.0f;
+	float PanSensitivity = 5.0f;
 };

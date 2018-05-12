@@ -41,10 +41,13 @@ void APEPlayerController::SetupPlayerInputComponent(class UInputComponent* Input
 		UE_LOG(LogTemp, Error, TEXT("PEPlayerController: Input Component not found::PointerProtection"));
 		return;
 	}
+	InputComponent->BindAction("TogglePan", IE_Pressed, this, &APEPlayerController::InputTogglePan);
+
 	InputComponent->BindAxis("MoveForward", this, &APEPlayerController::InputMoveCameraForward);
 	InputComponent->BindAxis("MoveRight", this, &APEPlayerController::InputMoveCameraRight);
 	InputComponent->BindAxis("FastMove", this, &APEPlayerController::InputFastMoveCamera);
-	InputComponent->BindAxis("Rotate", this, &APEPlayerController::InputRotateCamera);
+	InputComponent->BindAxis("RotateX", this, &APEPlayerController::InputRotateCameraX);
+	InputComponent->BindAxis("RotateY", this, &APEPlayerController::InputRotateCameraY);
 	InputComponent->BindAxis("ZoomIn", this, &APEPlayerController::InputZoomInCamera);
 
 }
@@ -53,16 +56,14 @@ void APEPlayerController::InputMoveCameraForward(float AxisValue) {
 	if (!CameraPawn) return;
 	if (!bCameraMoveable) return;
 	MovementSpeed = CalculateMovementSpeed();
-	FTransform FinalTransform = MovementX(MovementSpeed, FastMoveMultiplier, AxisValue);
-	CameraPawn->SetActorTransform(FinalTransform);
+	CameraPawn->SetActorTransform(MovementX(MovementSpeed, FastMoveMultiplier, AxisValue));
 }
 
 void APEPlayerController::InputMoveCameraRight(float AxisValue) {
 	if (!CameraPawn) return;
 	if (!bCameraMoveable) return;
 	MovementSpeed = CalculateMovementSpeed();
-	FTransform FinalTransform = MovementY(MovementSpeed, FastMoveMultiplier, AxisValue);
-	CameraPawn->SetActorTransform(FinalTransform);
+	CameraPawn->SetActorTransform(MovementY(MovementSpeed, FastMoveMultiplier, AxisValue));
 }
 
 void APEPlayerController::InputFastMoveCamera(float AxisValue) {
@@ -70,9 +71,21 @@ void APEPlayerController::InputFastMoveCamera(float AxisValue) {
 	if (!bCameraMoveable) return;
 }
 
-void APEPlayerController::InputRotateCamera(float AxisValue) {
+void APEPlayerController::InputRotateCameraX(float AxisValue) {
 	if (!CameraPawn) return;
 	if (!bCameraMoveable) return;
+
+	if (bPanToggled == true) {
+		LocalSpringArmComponent->SetWorldRotation(PanX(AxisValue, PanSensitivity));
+	}
+}
+void APEPlayerController::InputRotateCameraY(float AxisValue) {
+	if (!CameraPawn) return;
+	if (!bCameraMoveable) return;
+
+	if (bPanToggled == true) {
+		LocalSpringArmComponent->SetWorldRotation(PanY(AxisValue, PanSensitivity));
+	}
 }
 
 void APEPlayerController::InputZoomInCamera(float AxisValue) {
@@ -80,6 +93,10 @@ void APEPlayerController::InputZoomInCamera(float AxisValue) {
 	if (!bCameraMoveable) return;
 }
 
+void APEPlayerController::InputTogglePan() {
+	if (!bCameraMoveable) return;
+	bPanToggled = !bPanToggled;
+}
 
 ///////////////////////////////////////////////////
 /////////////// Camera Calculations ///////////////
@@ -132,4 +149,24 @@ FTransform APEPlayerController::MovementY(float AxisValue, float MovementSpeed, 
 	return FinalTransform;
 }
 
+FRotator APEPlayerController::PanX(float AxisValue, float PanSensitivity) {
+	PanSensitivity = PanSensitivity * AxisValue;
+	FRotator CameraPawnRot = LocalSpringArmComponent->GetComponentRotation();
+	float RotatorRoll, RotatorPitch, RotatorYaw;
+	UKismetMathLibrary::BreakRotator(CameraPawnRot, RotatorRoll, RotatorPitch, RotatorYaw);
+	PanSensitivity = PanSensitivity + RotatorYaw;
+	FRotator FinalRotator = UKismetMathLibrary::MakeRotator(RotatorRoll, RotatorPitch, PanSensitivity);
+	return FinalRotator;
+}
+
+FRotator APEPlayerController::PanY(float AxisValue, float PanSensitivity) {
+	PanSensitivity = PanSensitivity * AxisValue;
+	FRotator CameraPawnRot = LocalSpringArmComponent->GetComponentRotation();
+	float RotatorRoll, RotatorPitch, RotatorYaw;
+	UKismetMathLibrary::BreakRotator(CameraPawnRot, RotatorRoll, RotatorPitch, RotatorYaw);
+	PanSensitivity = PanSensitivity + RotatorPitch;
+	PanSensitivity = FMath::Clamp(PanSensitivity, -80.0f, 0.0f);
+	FRotator FinalRotator = UKismetMathLibrary::MakeRotator(RotatorRoll, PanSensitivity, RotatorYaw);
+	return FinalRotator;
+}
 ///////////////////////////////////////////////////
