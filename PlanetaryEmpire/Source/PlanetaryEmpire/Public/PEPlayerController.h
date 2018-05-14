@@ -16,9 +16,6 @@ public:
 	// Sets default values for this pawn's properties
 	APEPlayerController();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -48,11 +45,12 @@ private:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent);
 	void InputMoveCameraForward(float value);
 	void InputMoveCameraRight(float value);
-	void InputRotateCameraX(float value);
-	void InputRotateCameraY(float value);
-	void InputZoomInCamera(float value);
+	void InputCameraX(float value);
+	void InputCameraY(float value);
 	void InputTogglePan();
 	void InputToggleFastMove();
+	void InputZoomIn();
+	void InputZoomOut();
 
 	// Camera Functions
 	float CalculateMovementSpeed();
@@ -60,6 +58,7 @@ private:
 	FTransform MovementY(float AxisValue, float MoveSensitivity, float SpeedMultiplier);
 	FRotator PanX(float AxisValue, float PanSensitiviy);
 	FRotator PanY(float AxisValue, float PanSensitivity);
+	void ScreenEdgeMovement(float AxisValue, float &DeltaXSpeed, float &DeltaYSpeed);
 
 	//Camera Variables
 	bool bCameraMoveable = true;
@@ -68,4 +67,9 @@ private:
 	float MovementSpeed = 0.0f;
 	float FastMoveMultiplier = 1.0f;
 	float PanSensitivity = 5.0f;
+	float ZoomSensitivity = 50.0f;
+	float MinArmDistance = 500.0f;
+	float MaxArmDistance = 2500.0f;
+	float EdgeMoveSpeedX = 0.0f;
+	float EdgeMoveSpeedY = 0.0f;
 };

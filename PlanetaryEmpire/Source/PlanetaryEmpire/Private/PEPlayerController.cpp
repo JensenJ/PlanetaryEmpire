@@ -6,7 +6,7 @@
 #include "Kismet/KismetMathLibrary.h"
 
 APEPlayerController::APEPlayerController() {
-	
+
 }
 
 APECameraPawn* APEPlayerController::GetControlledPawn() const{
@@ -27,9 +27,6 @@ void APEPlayerController::BeginPlay() {
 	LocalSpringArmComponent = CameraPawn->GetSpringArmComponent();
 	LocalCameraComponent = CameraPawn->GetCameraComponent();
 }
-void APEPlayerController::Tick(float DeltaTime) {
-
-}
 
 ///////////////////////////////////////////////////
 ///////////////// Player Input ////////////////////
@@ -43,12 +40,13 @@ void APEPlayerController::SetupPlayerInputComponent(class UInputComponent* Input
 	}
 	InputComponent->BindAction("TogglePan", IE_Pressed, this, &APEPlayerController::InputTogglePan);
 	InputComponent->BindAction("FastMove", IE_Pressed, this, &APEPlayerController::InputToggleFastMove);
+	InputComponent->BindAction("ZoomIn", IE_Pressed, this, &APEPlayerController::InputZoomIn);
+	InputComponent->BindAction("ZoomOut", IE_Pressed, this, &APEPlayerController::InputZoomOut);
 
 	InputComponent->BindAxis("MoveForward", this, &APEPlayerController::InputMoveCameraForward);
 	InputComponent->BindAxis("MoveRight", this, &APEPlayerController::InputMoveCameraRight);
-	InputComponent->BindAxis("RotateX", this, &APEPlayerController::InputRotateCameraX);
-	InputComponent->BindAxis("RotateY", this, &APEPlayerController::InputRotateCameraY);
-	InputComponent->BindAxis("ZoomIn", this, &APEPlayerController::InputZoomInCamera);
+	InputComponent->BindAxis("XMovement", this, &APEPlayerController::InputCameraX);
+	InputComponent->BindAxis("YMovement", this, &APEPlayerController::InputCameraY);
 
 }
 
@@ -66,27 +64,32 @@ void APEPlayerController::InputMoveCameraRight(float AxisValue) {
 	CameraPawn->SetActorTransform(MovementY(AxisValue, MovementSpeed, FastMoveMultiplier));
 }
 
-void APEPlayerController::InputRotateCameraX(float AxisValue) {
+void APEPlayerController::InputCameraX(float AxisValue) {
 	if (!CameraPawn) return;
 	if (!bCameraMoveable) return;
 
 	if (bPanToggled == true) {
 		CameraPawn->SetActorRotation(PanX(AxisValue, PanSensitivity));
 	}
+	float XDeltaSpeed, YDeltaSpeed;
+	ScreenEdgeMovement(AxisValue, XDeltaSpeed, YDeltaSpeed);
+	FVector LocalOffsetVector = UKismetMathLibrary::MakeVector(XDeltaSpeed, YDeltaSpeed, 0.0f);
+	CameraPawn->AddActorLocalOffset(LocalOffsetVector, true);
 }
-void APEPlayerController::InputRotateCameraY(float AxisValue) {
+
+void APEPlayerController::InputCameraY(float AxisValue) {
 	if (!CameraPawn) return;
 	if (!bCameraMoveable) return;
 
 	if (bPanToggled == true) {
 		CameraPawn->SetActorRotation(PanY(AxisValue, PanSensitivity));
 	}
+	float XDeltaSpeed, YDeltaSpeed;
+	ScreenEdgeMovement(AxisValue, XDeltaSpeed, YDeltaSpeed);
+	FVector LocalOffsetVector = UKismetMathLibrary::MakeVector(XDeltaSpeed, YDeltaSpeed, 0.0f);
+	CameraPawn->AddActorLocalOffset(LocalOffsetVector, true);
 }
 
-void APEPlayerController::InputZoomInCamera(float AxisValue) {
-	if (!CameraPawn) return;
-	if (!bCameraMoveable) return;
-}
 
 void APEPlayerController::InputTogglePan() {
 	if (!bCameraMoveable) return;
@@ -102,6 +105,21 @@ void APEPlayerController::InputToggleFastMove() {
 	else {
 		FastMoveMultiplier = 1.0f;
 	}
+}
+void APEPlayerController::InputZoomIn() {
+	if (!CameraPawn) return;
+	if (!bCameraMoveable) return;
+	float ZoomValue = LocalSpringArmComponent->TargetArmLength - ZoomSensitivity;
+	ZoomValue = FMath::Clamp(ZoomValue, MinArmDistance, MaxArmDistance);
+	LocalSpringArmComponent->TargetArmLength = ZoomValue;
+}
+
+void APEPlayerController::InputZoomOut() {
+	if (!CameraPawn) return;
+	if (!bCameraMoveable) return;
+	float ZoomValue = LocalSpringArmComponent->TargetArmLength + ZoomSensitivity;
+	ZoomValue = FMath::Clamp(ZoomValue, MinArmDistance, MaxArmDistance);
+	LocalSpringArmComponent->TargetArmLength = ZoomValue;
 }
 ///////////////////////////////////////////////////
 /////////////// Camera Calculations ///////////////
@@ -175,7 +193,40 @@ FRotator APEPlayerController::PanY(float AxisValue, float PanSensitivity) {
 	float RotatorRoll, RotatorPitch, RotatorYaw;
 	UKismetMathLibrary::BreakRotator(CameraPawnRot, RotatorRoll, RotatorPitch, RotatorYaw);
 	PanSensitivity = PanSensitivity + RotatorPitch;
-	PanSensitivity = FMath::Clamp(PanSensitivity, -80.0f, 0.0f);
+	PanSensitivity = FMath::Clamp(PanSensitivity, -80.0f, -15.0f);
 	FRotator FinalRotator = UKismetMathLibrary::MakeRotator(RotatorRoll, PanSensitivity, RotatorYaw);
 	return FinalRotator;
+}
+
+void APEPlayerController::ScreenEdgeMovement(float AxisValue, float &DeltaXSpeed, float &DeltaYSpeed) {
+	int SizeX, SizeY;
+	GetViewportSize(SizeX, SizeY);
+	float XLocation, YLocation;
+	GetMousePosition(XLocation, YLocation);
+	float CursorLocationX = XLocation / SizeX;
+	float CursorLocationY = YLocation / SizeY;
+	if (CursorLocationX >= 0.975f) {
+		EdgeMoveSpeedX = 5.0f;
+	}
+	else {
+		if (CursorLocationX <= 0.025f) {
+			EdgeMoveSpeedX = -5.0f;
+		}
+		else {
+			EdgeMoveSpeedX = 0.0f;
+		}
+	}
+	if (CursorLocationY >= 0.975f) {
+		EdgeMoveSpeedY = -5.0f;
+	}
+	else {
+		if (CursorLocationY <= 0.025f) {
+			EdgeMoveSpeedY = 5.0f;
+		}
+		else {
+			EdgeMoveSpeedY = 0.0f;
+		}
+	}
+	DeltaXSpeed = EdgeMoveSpeedY * FastMoveMultiplier;
+	DeltaYSpeed = EdgeMoveSpeedX * FastMoveMultiplier;
 }

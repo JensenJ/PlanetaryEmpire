@@ -46,7 +46,6 @@ APECameraPawn::APECameraPawn(const class FObjectInitializer& ObjectInit)
 		return;
 	}
 
-
 	// Setup scene component
 	SceneComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	this->SetRootComponent(SceneComponent);
