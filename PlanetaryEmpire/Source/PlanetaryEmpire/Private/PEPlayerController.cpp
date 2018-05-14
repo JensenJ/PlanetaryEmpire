@@ -71,7 +71,7 @@ void APEPlayerController::InputRotateCameraX(float AxisValue) {
 	if (!bCameraMoveable) return;
 
 	if (bPanToggled == true) {
-		LocalSpringArmComponent->SetWorldRotation(PanX(AxisValue, PanSensitivity));
+		CameraPawn->SetActorRotation(PanX(AxisValue, PanSensitivity));
 	}
 }
 void APEPlayerController::InputRotateCameraY(float AxisValue) {
@@ -79,7 +79,7 @@ void APEPlayerController::InputRotateCameraY(float AxisValue) {
 	if (!bCameraMoveable) return;
 
 	if (bPanToggled == true) {
-		LocalSpringArmComponent->SetWorldRotation(PanY(AxisValue, PanSensitivity));
+		CameraPawn->SetActorRotation(PanY(AxisValue, PanSensitivity));
 	}
 }
 
@@ -153,15 +153,15 @@ FTransform APEPlayerController::MovementY(float AxisValue, float MovementSpeed, 
 	FVector AddedVector = TransformDirection + OutTransform;
 	float x, y, z;
 	UKismetMathLibrary::BreakVector(AddedVector, x, y, z);
-	z = 50;
+	z = 100;
 	FVector FinalVector = UKismetMathLibrary::MakeVector(x, y, z);
-	FTransform FinalTransform = UKismetMathLibrary::MakeTransform(AddedVector, OutRotator, OutScale);
+	FTransform FinalTransform = UKismetMathLibrary::MakeTransform(FinalVector, OutRotator, OutScale);
 	return FinalTransform;
 }
 
 FRotator APEPlayerController::PanX(float AxisValue, float PanSensitivity) {
 	PanSensitivity = PanSensitivity * AxisValue;
-	FRotator CameraPawnRot = LocalSpringArmComponent->GetComponentRotation();
+	FRotator CameraPawnRot = CameraPawn->GetActorRotation();
 	float RotatorRoll, RotatorPitch, RotatorYaw;
 	UKismetMathLibrary::BreakRotator(CameraPawnRot, RotatorRoll, RotatorPitch, RotatorYaw);
 	PanSensitivity = PanSensitivity + RotatorYaw;
@@ -171,7 +171,7 @@ FRotator APEPlayerController::PanX(float AxisValue, float PanSensitivity) {
 
 FRotator APEPlayerController::PanY(float AxisValue, float PanSensitivity) {
 	PanSensitivity = PanSensitivity * AxisValue;
-	FRotator CameraPawnRot = LocalSpringArmComponent->GetComponentRotation();
+	FRotator CameraPawnRot = CameraPawn->GetActorRotation();
 	float RotatorRoll, RotatorPitch, RotatorYaw;
 	UKismetMathLibrary::BreakRotator(CameraPawnRot, RotatorRoll, RotatorPitch, RotatorYaw);
 	PanSensitivity = PanSensitivity + RotatorPitch;

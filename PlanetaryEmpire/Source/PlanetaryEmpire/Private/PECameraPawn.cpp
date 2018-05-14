@@ -46,19 +46,21 @@ APECameraPawn::APECameraPawn(const class FObjectInitializer& ObjectInit)
 		return;
 	}
 
+
 	// Setup scene component
 	SceneComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	this->SetRootComponent(SceneComponent);
 	SceneComponent->RelativeLocation = FVector(0.0f, 0.0f, 50.0f);
 
 	// Setup sphere component
 	SphereComponent->AttachToComponent(SceneComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	SphereComponent->RelativeLocation = FVector(0.0f, 0.0f, 0.0f);
-	SphereComponent->RelativeRotation = FRotator(-70.0f, 0.0f, 0.0f);
+	SphereComponent->RelativeRotation = FRotator(0.0f, 0.0f, 0.0f);
 	SphereComponent->bHiddenInGame = false;
 
 	// Setup spring arm component
 	SpringArmComponent->AttachToComponent(SphereComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	SpringArmComponent->bAbsoluteRotation = true;
+	SpringArmComponent->bAbsoluteRotation = false;
 	SpringArmComponent->TargetArmLength = 1500.0f;
 	SpringArmComponent->SocketOffset = FVector(0.0f, 0.0f, 0.0f);
 	SpringArmComponent->RelativeRotation = FRotator(0.0, 0.0f, 0.0f);
