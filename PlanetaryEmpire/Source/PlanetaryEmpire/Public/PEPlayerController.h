@@ -52,7 +52,7 @@ private:
 	void InputZoomIn();
 	void InputZoomOut();
 
-	// Camera Functions
+	// Camera Calculation Functions
 	float CalculateMovementSpeed();
 	FTransform MovementX(float AxisValue, float MoveSensitivity, float SpeedMultiplier);
 	FTransform MovementY(float AxisValue, float MoveSensitivity, float SpeedMultiplier);
@@ -65,6 +65,8 @@ private:
 	bool bPanToggled = false;
 	bool bFastMove = false;
 	float MovementSpeed = 0.0f;
+	float MovementSpeedMin = 5.0f;
+	float MovementSpeedMax = 20.0f;
 	float FastMoveMultiplier = 1.0f;
 	float PanSensitivity = 5.0f;
 	float ZoomSensitivity = 50.0f;

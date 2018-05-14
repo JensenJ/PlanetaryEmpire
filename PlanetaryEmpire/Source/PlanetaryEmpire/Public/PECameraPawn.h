@@ -19,7 +19,7 @@ public:
 	// Sets default values for this pawn's properties
 	APECameraPawn(const FObjectInitializer& ObjectInit);
 
-	// Getters
+	// Getters for all camera components
 	USceneComponent* GetSceneComponent();
 	USphereComponent* GetSphereComponent();
 	USpringArmComponent* GetSpringArmComponent();
