@@ -25,8 +25,9 @@ private:
 	// Clock Functions
 	void SetClockwork(float DeltaSeconds);
 	void Clock();
+	void Calendar();
 	// Clock Variables
-	float TimeUnit = 1.0f;
+	float TimeUnit = 0.25f;
 	float Clockwork = 0.0f;
 	float DayTick = 0;
 	int32 Seconds = 0;
