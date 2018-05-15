@@ -4,13 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "PlanetaryEmpireGameModeBase.generated.h"
+#include "PEGameModeBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PLANETARYEMPIRE_API APlanetaryEmpireGameModeBase : public AGameModeBase
+class PLANETARYEMPIRE_API APEGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+private:
+	APEGameModeBase();
 };
