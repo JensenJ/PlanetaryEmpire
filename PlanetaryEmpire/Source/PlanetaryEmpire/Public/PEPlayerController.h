@@ -51,6 +51,8 @@ private:
 	void InputToggleFastMove();
 	void InputZoomIn();
 	void InputZoomOut();
+	void InputResetPan();
+	void InputResetZoom();
 
 	// Camera Calculation Functions
 	float CalculateMovementSpeed();

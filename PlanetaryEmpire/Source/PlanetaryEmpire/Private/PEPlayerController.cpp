@@ -6,7 +6,10 @@
 #include "Kismet/KismetMathLibrary.h"
 
 APEPlayerController::APEPlayerController() {
-
+	// Allows mouse cursor to interact with buttons and screen and be displayed
+	bShowMouseCursor = true;
+	bEnableClickEvents = true;
+	bEnableMouseOverEvents = true;
 }
 
 // Retrieves the PECameraPawn class
@@ -19,7 +22,7 @@ void APEPlayerController::BeginPlay() {
 
 	// Get camera pawn class
 	CameraPawn = GetControlledPawn();
-	// Check if it was found
+	// Check if camera pawn was found
 	if (!CameraPawn) {
 		UE_LOG(LogTemp, Error, TEXT("PEPlayerController: CameraPawn Class not found"));
 		return;
@@ -47,6 +50,8 @@ void APEPlayerController::SetupPlayerInputComponent(class UInputComponent* Input
 	InputComponent->BindAction("FastMove", IE_Pressed, this, &APEPlayerController::InputToggleFastMove);
 	InputComponent->BindAction("ZoomIn", IE_Pressed, this, &APEPlayerController::InputZoomIn);
 	InputComponent->BindAction("ZoomOut", IE_Pressed, this, &APEPlayerController::InputZoomOut);
+	InputComponent->BindAction("ResetPan", IE_Pressed, this, &APEPlayerController::InputResetPan);
+	InputComponent->BindAction("ResetZoom", IE_Pressed, this, &APEPlayerController::InputResetZoom);
 	// Binding axis
 	InputComponent->BindAxis("MoveForward", this, &APEPlayerController::InputMoveCameraForward);
 	InputComponent->BindAxis("MoveRight", this, &APEPlayerController::InputMoveCameraRight);
@@ -126,11 +131,24 @@ void APEPlayerController::InputZoomIn() {
 }
 // Sets new zoom out value
 void APEPlayerController::InputZoomOut() {
-	if(!CameraPawn) return; // Checks for camera pawn
+	if (!CameraPawn) return; // Checks for camera pawn
 	if (!bCameraMoveable) return; // Checks whether camera is move able or not
 	float ZoomValue = LocalSpringArmComponent->TargetArmLength + ZoomSensitivity; // Adds zoom sensitivity to target arm length
 	ZoomValue = FMath::Clamp(ZoomValue, MinArmDistance, MaxArmDistance); // Clamps values between min and max
 	LocalSpringArmComponent->TargetArmLength = ZoomValue; // Sets new spring arm length
+}
+// Resets panning
+void APEPlayerController::InputResetPan() {
+	if (!CameraPawn) return; // Checks for camera pawn
+	if (!bCameraMoveable) return; // Checks whether camera is move able or not
+	bPanToggled = false; // Turns the panning mode off
+	CameraPawn->SetActorRotation(FRotator(-15.0f, 0.0f, 0.0f)); // Rotates back to original rotation
+}
+// Resets zoom
+void APEPlayerController::InputResetZoom() {
+	if (!CameraPawn) return; // Checks for camera pawn
+	if (!bCameraMoveable) return; // Checks whether camera is move able or not
+	LocalSpringArmComponent->TargetArmLength = 1500.0f; // Sets spring arm length to default value
 }
 ///////////////////////////////////////////////////
 /////////////// Camera Calculations ///////////////

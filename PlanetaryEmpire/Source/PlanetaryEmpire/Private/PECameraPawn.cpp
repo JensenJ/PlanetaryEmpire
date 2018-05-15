@@ -68,8 +68,6 @@ APECameraPawn::APECameraPawn(const class FObjectInitializer& ObjectInit)
 	CameraComponent->AttachToComponent(SpringArmComponent, FAttachmentTransformRules::KeepRelativeTransform, USpringArmComponent::SocketName);
 	CameraComponent->bUsePawnControlRotation = false;
 	SphereComponent->RelativeLocation = FVector(0.0f, 0.0f, 0.0f);
-
-	///////////////////////////////////////////////////
 }
 
 // Called when the game starts or when spawned
